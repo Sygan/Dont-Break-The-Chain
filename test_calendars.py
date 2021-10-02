@@ -12,8 +12,8 @@ def main():
         date(2019, 4, 1),    # First row starts on Monday the 1st
     ]
     for d in test_dates:
-        generate_calendar("test_{}.pdf".format(d.strftime("%Y-%m-%d")), d)
-    generate_calendar("test_today.pdf", date.today())
+        generate_calendar("test_{}.pdf".format(d.strftime("%Y-%m-%d")), False, d)
+    generate_calendar("test_today.pdf", False, date.today())
 
 if __name__ == "__main__":
     main()

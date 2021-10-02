@@ -13,6 +13,8 @@ from reportlab.lib.pagesizes import letter, A4
 COLOR_BLACK = "#000000"
 COLOR_GRAY = "#777777"
 
+
+
 def add_one_year(d):
     """Calculates the number of days until the same date next year."""
     same_day_next_year = d + timedelta(days=365)
@@ -27,13 +29,18 @@ def add_one_year(d):
 
     return same_day_next_year
 
-def get_day_pos(d):
+def get_day_pos(d, sunday_first):
     # Rotates the days by 1 so Sunday is the beginning of the week
-    return (d.weekday() + 1) % 7
+    if sunday_first is True:
+        return (d.weekday() + 1) % 7
+    else:
+        # Don't rotate days because some people actually want normal start day and not religous based one. @Sygan
+        return d.weekday()
 
 class CalendarDrawing:
 
-    def __init__(self, start_date=None, end_date=None, label_side="left"):
+    def __init__(self, sunday_first=False, start_date=None, end_date=None, label_side="left"):
+        self.sunday_first = sunday_first
         self.start_date = date.today() if start_date is None else start_date
         if end_date is None:
             # Default to one year, correcting for leap year.
@@ -77,7 +84,7 @@ class CalendarDrawing:
             week.append(d)
 
             d += timedelta(days=1)
-            if get_day_pos(d) == 0:
+            if get_day_pos(d, self.sunday_first) == 0:
                 yield week
                 week = []
                 row += 1
@@ -101,14 +108,14 @@ class CalendarDrawing:
 
             # Month divider (line between months)
             if 1 in days_of_month:
-                col = get_day_pos(week[days_of_month.index(1)])
+                col = get_day_pos(week[days_of_month.index(1)], self.sunday_first)
                 self.draw_month_divider(canvas, x, y, row, col)
 
             # Days of Month
             for d in week:
                 self.set_font_style(canvas, "day", d)
                 canvas.drawCentredString(
-                    x + self.col_spacing*get_day_pos(d),
+                    x + self.col_spacing*get_day_pos(d, self.sunday_first),
                     y - self.row_spacing*row,
                     str(d.day)
                 )
@@ -193,7 +200,7 @@ class CalendarDrawing:
 
         return left, right
 
-def generate_calendar(outfile, start_date=None):
+def generate_calendar(outfile, sunday_first=False, start_date=None):
     c = canvas.Canvas(outfile, pagesize=letter)
     c.setAuthor("Michael Brown")
     w, h = letter
@@ -202,7 +209,7 @@ def generate_calendar(outfile, start_date=None):
     if start_date is None:
         start_date = date.today()
 
-    cal = CalendarDrawing(start_date)
+    cal = CalendarDrawing(sunday_first, start_date)
     left_col, right_col = cal.split()
     middle_padding = 50
     left_col.draw(c, center - middle_padding/2 - left_col.get_width(), h-195, show_year_on_first_row=True)
