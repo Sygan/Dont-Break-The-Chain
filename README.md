@@ -2,7 +2,7 @@
 Don't Break the Chain Generator
 ===============================
 
-My fork allows to start the calendar from any day and allows to set monday as first day of the week so not to follow religous stuff. :) 
+My fork allows to set monday as first day of the week so not to follow religous stuff. :) 
 
 Original readme:
 ===============================
